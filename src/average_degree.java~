@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
- import java.math.BigDecimal;
+ 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,11 +35,12 @@ public class average_degree {
                      return  Tweet1.created_at.compareTo(Tweet2.created_at);
                  }
              });
-             
+             // ArrayList<Tweet> SortedList = tweetLst. .OrderBy(o => o.RealDateTime).ToList();
 
               Tweet twt = tweetLst.get(0);
               
-             
+              //Date MinMax60=twt.RealDateTime;
+              //MinMax60.setMinutes(twt.RealDateTime.getMinutes()-1);
               Calendar cal = Calendar.getInstance();
               cal.setTime(twt.getRealDateTime());
               cal.add(Calendar.MINUTE, -1);
@@ -49,6 +50,7 @@ public class average_degree {
                 
               ArrayList<Tweet> last60Tweets = new ArrayList<Tweet>(); //SortedList.Where(o => o.RealDateTime <= twt.RealDateTime && o.RealDateTime >= MaxMin60).ToList();
 for(int x=0;x<tweetLst.size();x++){
+ //date1.compareTo(date2)>0 System.out.println("Date1 is after Date2");
  if(twt.getRealDateTime().compareTo(tweetLst.get(x).getRealDateTime()) >=0 && tweetLst.get(x).getRealDateTime().compareTo(oneMinBack) >=0)
   last60Tweets.add(tweetLst.get(x));
 }
@@ -58,7 +60,6 @@ for(int x=0;x<tweetLst.size();x++){
 
               for(int y=0;y<last60Tweets.size();y++)
               {
-                last60Tweets.get(y).DoublecateHT=0;
                   for(int z=0;z<last60Tweets.get(y).getHashtags().size();z++ )
                   {
                       boolean IsFound = false;
@@ -68,7 +69,6 @@ for(int x=0;x<tweetLst.size();x++){
                           if (hashLst.get(n).text.toString().equals(last60Tweets.get(y).getHashtags().get(z).text.toString()))
                           {
                               IsFound = true;
-                              last60Tweets.get(y).DoublecateHT++;
                               break;
                           }
                       }
@@ -86,25 +86,27 @@ for(int x=0;x<tweetLst.size();x++){
               {
                Tweet tt= last60Tweets.get(y);
                   BigCount = BigCount + (tt.hashtags.size() * (tt.hashtags.size() - 1));
-                  if(last60Tweets.get(y).DoublecateHT >0)
-              {
-               BigCount = BigCount - (last60Tweets.get(y).DoublecateHT -1) * last60Tweets.get(y).DoublecateHT;
               }
-                  
-              }
-              
-              if(BigSum != 0)
+
               Avg = BigCount / BigSum;
-              else
-              Avg=0;
+
               twt.Avg = Avg;
 
               String strAvg = "";
-             strAvg =truncateDecimal(twt.Avg,2).toString();
+              String Conv =Double.toString(twt.Avg);
+              String[] arr = Conv.split(".");
+
+              if (arr.length > 1)
+                  if (Conv.split(".")[1].length() > 1)
+                      strAvg = arr[0] + '.' + arr[1].substring(0, 2);
+                  else
+                      strAvg = arr[0] + '.' + arr[1];
+              else
+                  strAvg = Double.toString(twt.getAvg());
 
 
              Result= Result+ strAvg + "\r\n";
-
+System.out.println(Result);
 
           }
           catch (Exception ex)
@@ -114,14 +116,7 @@ for(int x=0;x<tweetLst.size();x++){
       }
    
    
-     private static BigDecimal truncateDecimal(double x,int numberofDecimals)
-   {
-       if ( x > 0) {
-           return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_FLOOR);
-       } else {
-           return new BigDecimal(String.valueOf(x)).setScale(numberofDecimals, BigDecimal.ROUND_CEILING);
-       }
-   }
+   
    
    
  public static void writeStringtoFile(String path, String result){
@@ -130,11 +125,12 @@ for(int x=0;x<tweetLst.size();x++){
     
    File file;
    String content = result;
-      file = new File(path); 
+      file = new File(path); //path
     fop = new FileOutputStream(file);
 
     // if file doesnt exists, then create it
     if (!file.exists()) {
+     //file.createNewFile();
       System.out.println("Error");
     }
 
@@ -208,7 +204,7 @@ for(int x=0;x<tweetLst.size();x++){
                
                  writeStringtoFile(OFile,Result);
                  
-                  
+                  System.out.println("Done");
               }
               // line is not visible here.
           } catch (FileNotFoundException e1) {
@@ -219,6 +215,18 @@ for(int x=0;x<tweetLst.size();x++){
      e1.printStackTrace();
     }
           
+             //Object obj = parser.parse(new FileReader());
+  
+            
+           
+           
+         
+  
+
+  
+   
+
+
  } 
   
  
@@ -227,7 +235,10 @@ for(int x=0;x<tweetLst.size();x++){
           hashtags ht = new hashtags();
             JSONObject jsonobject = (JSONObject)sp_arr.get(i);
             ht.setText((String) jsonobject.get("text"));
+            //ht.indices =  (String)jsonobject.get("indices");
             
+           
+        
    boolean isFound = false;
    hashtags th=new hashtags();
    for(int b = 0; b < t.getHashtags().size(); b++)
@@ -251,9 +262,17 @@ for(int x=0;x<tweetLst.size();x++){
    SimpleDateFormat format =new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
    SimpleDateFormat postFormater = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
    SimpleDateFormat a = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.getDefault());
-  
+   //a.setTimeZone(TimeZone.getTimeZone("GMT"));
    CreatDdate = (Date)a.parse(dateStr);
-   return CreatDdate;
+   //sformat.applyPattern("dd/MM/yyyy hh:mm:ss");
+   //String acc= format.format(CreatDdate);
+   //Date startDate = new Date ();
+   //startDate = postFormater.parse(acc);
+   //Date avv = new Date();
+   //avv.parse(acc);
+   //CreatDdate= postFormater.format(CreatDdate).toString();
+   
+    return CreatDdate;
   } catch (ParseException e) {
    // TODO Auto-generated catch block
     return null;
